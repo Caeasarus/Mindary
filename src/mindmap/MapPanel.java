@@ -12,6 +12,7 @@ import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import javax.swing.JPanel;
@@ -35,6 +36,9 @@ public class MapPanel extends JPanel{
         this.add = new Button(0, 0, 10, 10, Button.Type.ADD);
         this.dy = 0;
         this.dx = 0;
+        
+        Movement moveMap = new Movement(this);
+        
         this.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e){
@@ -42,6 +46,16 @@ public class MapPanel extends JPanel{
             }
 
         });
+        
+        this.addMouseMotionListener(new MouseMotionAdapter() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                moveMap.processDraged(e);
+            }
+           
+        });
+                
+                
         Button leftButton = new Button(1, 400 - 10, 10, 10,
                 Button.Type.LEFT);
         Button rightButton = new Button(400 - 20, 400
@@ -155,7 +169,7 @@ public class MapPanel extends JPanel{
         //</editor-fold>
         this.repaint();
     }
-
+    
     protected void processKey(KeyEvent e){
         for(MindPoint mindpoint : mindpoints){
             if(mindpoint.isProcessingInput()){
