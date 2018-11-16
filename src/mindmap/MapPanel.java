@@ -15,6 +15,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionAdapter;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 /**
@@ -28,7 +29,7 @@ public class MapPanel extends JPanel{
     private ArrayList<MindPoint> mindpoints;
     private ArrayList<Button> scrollButtons;
     private Button add;
-    private boolean adding;
+    private int adding;
 
     public MapPanel(){
         this.mindpoints = new ArrayList<>();
@@ -36,9 +37,10 @@ public class MapPanel extends JPanel{
         this.add = new Button(0, 0, 10, 10, Button.Type.ADD);
         this.dy = 0;
         this.dx = 0;
-        
+        this.adding = -1;
+
         Movement moveMap = new Movement(this);
-        
+
         this.addMouseListener(new MouseAdapter(){
             @Override
             public void mouseClicked(MouseEvent e){
@@ -46,16 +48,15 @@ public class MapPanel extends JPanel{
             }
 
         });
-        
-        this.addMouseMotionListener(new MouseMotionAdapter() {
+
+        this.addMouseMotionListener(new MouseMotionAdapter(){
             @Override
-            public void mouseDragged(MouseEvent e) {
+            public void mouseDragged(MouseEvent e){
                 moveMap.processDraged(e);
             }
-           
+
         });
-                
-                
+
         Button leftButton = new Button(1, 400 - 10, 10, 10,
                 Button.Type.LEFT);
         Button rightButton = new Button(400 - 20, 400
@@ -141,15 +142,26 @@ public class MapPanel extends JPanel{
                 && new Rectangle2D.Double(this.add.getX(), this.add.getY(),
                         this.add.getWidth(), this.add.getHeight())
                         .contains(clickPoint.getX(), clickPoint.getY())){
-            this.adding = true;
-            setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+            String[] options = {"Cancel", "Mindpoint", "Connection"};
+            this.adding = JOptionPane.showOptionDialog(this,
+                    "What would you like to add?", "Add Object",
+                    JOptionPane.YES_NO_CANCEL_OPTION,
+                    JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
+            if(this.adding != -1 && this.adding != 0){
+                setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+            }
             processed = true;
         }
-        if(!processed && this.adding){
-            this.addMindpoint(new MindPoint(e.getX() - 50 + this.dx,
-                    e.getY() - 50 + this.dy, 100, 50, 3));
+        if(!processed && this.adding != -1){
+            switch(this.adding){
+                case 1:
+                    this.addMindpoint(new MindPoint(e.getX() - 50 + this.dx,
+                            e.getY() - 25 + this.dy, 100, 50, 3));
+                    break;
+                case 2: break;
+            }
+            this.adding = -1;
             setCursor(Cursor.getDefaultCursor());
-            this.adding = false;
             processed = true;
         }
         //<editor-fold defaultstate="collapsed" desc="mindpoints">
@@ -169,7 +181,7 @@ public class MapPanel extends JPanel{
         //</editor-fold>
         this.repaint();
     }
-    
+
     protected void processKey(KeyEvent e){
         for(MindPoint mindpoint : mindpoints){
             if(mindpoint.isProcessingInput()){
