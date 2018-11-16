@@ -25,12 +25,14 @@ public class MapPanel extends JPanel{
     private int dx;
     private int dy;
     private ArrayList<MindPoint> mindpoints;
-
     private ArrayList<Button> scrollButtons;
+    private Button add;
+    private boolean adding;
 
     public MapPanel(){
         this.mindpoints = new ArrayList<>();
         this.scrollButtons = new ArrayList<>();
+        this.add = new Button(0, 0, 10, 10, Button.Type.ADD);
         this.dy = 0;
         this.dx = 0;
         this.addMouseListener(new MouseAdapter(){
@@ -41,15 +43,15 @@ public class MapPanel extends JPanel{
 
         });
         Button leftButton = new Button(1, 400 - 10, 10, 10,
-                Button.Rotation.LEFT);
+                Button.Type.LEFT);
         Button rightButton = new Button(400 - 20, 400
                 - 10, 10, 10,
-                Button.Rotation.RIGHT);
+                Button.Type.RIGHT);
         Button upButton = new Button(400 - 10, 0, 10, 10,
-                Button.Rotation.UP);
+                Button.Type.UP);
         Button downButton = new Button(400 - 10, 400
                 - 20, 10, 10,
-                Button.Rotation.DOWN);
+                Button.Type.DOWN);
         this.scrollButtons.add(leftButton);
         this.scrollButtons.add(rightButton);
         this.scrollButtons.add(upButton);
@@ -67,6 +69,7 @@ public class MapPanel extends JPanel{
         scrollButtons.forEach((button) -> {
             button.draw(g2d);
         });
+        this.add.draw(g2d);
     }
 
     public boolean addMindpoint(MindPoint mindpoint){
@@ -94,29 +97,15 @@ public class MapPanel extends JPanel{
     }
 
     private void processClick(MouseEvent e){
+        boolean processed = false;
         Point clickPoint = e.getPoint();
 //        System.out.println(clickPoint.getX() + " " + clickPoint.getY());
-        boolean found = false;
-        //<editor-fold defaultstate="collapsed" desc="mindpoints">
-        for(MindPoint mindpoint : mindpoints){
-            if(mindpoint.getInnerEllipse(this.dx, this.dy)
-                    .contains(clickPoint.getX(), clickPoint.getY())){
-                if(!found){
-                    System.out.println("g");
-                    mindpoint.processInput(true);
-                }
-                found = true;
-            }else{
-                mindpoint.processInput(false);
-            }
-        }
-        //</editor-fold>
         //<editor-fold defaultstate="collapsed" desc="scrollbuttons">
         for(Button button : scrollButtons){
             if(new Rectangle2D.Double(button.getX(), button.getY(),
                     button.getWidth(), button.getHeight())
                     .contains(clickPoint.getX(), clickPoint.getY())){
-                switch(button.getRotation()){
+                switch(button.getType()){
                     case LEFT:
                         this.dx -= 5;
                         break;
@@ -130,11 +119,41 @@ public class MapPanel extends JPanel{
                         this.dy += 5;
                         break;
                 }
+                processed = true;
+            }
+        }
+        //</editor-fold>
+        if(!processed
+                && new Rectangle2D.Double(this.add.getX(), this.add.getY(),
+                        this.add.getWidth(), this.add.getHeight())
+                        .contains(clickPoint.getX(), clickPoint.getY())){
+            this.adding = true;
+            setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+            processed = true;
+        }
+        if(!processed && this.adding){
+            this.addMindpoint(new MindPoint(e.getX() - 50 + this.dx,
+                    e.getY() - 50 + this.dy, 100, 50, 3));
+            setCursor(Cursor.getDefaultCursor());
+            this.adding = false;
+            processed = true;
+        }
+        //<editor-fold defaultstate="collapsed" desc="mindpoints">
+        boolean found = false;
+        for(MindPoint mindpoint : mindpoints){
+            if(mindpoint.getInnerEllipse(this.dx, this.dy)
+                    .contains(clickPoint.getX(), clickPoint.getY())){
+                if(!found && !processed){
+                    mindpoint.processInput(true);
+                    processed = true;
+                }
+                found = true;
+            }else{
+                mindpoint.processInput(false);
             }
         }
         //</editor-fold>
         this.repaint();
-        //setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
     }
 
     protected void processKey(KeyEvent e){
