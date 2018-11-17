@@ -47,12 +47,23 @@ public class MapPanel extends JPanel{
                 processClick(e);
             }
 
+            @Override
+            public void mouseReleased(MouseEvent me) {
+                moveMap.processReleased(me);
+            }
+
+            @Override
+            public void mousePressed(MouseEvent me) {
+                moveMap.processPressed(me);
+            }
+              
+
         });
 
         this.addMouseMotionListener(new MouseMotionAdapter(){
             @Override
             public void mouseDragged(MouseEvent e){
-                moveMap.processDraged(e);
+                moveMap.processDragged(e);
             }
 
         });
