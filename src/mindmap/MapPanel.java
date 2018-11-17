@@ -8,6 +8,7 @@ package mindmap;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -63,12 +64,17 @@ public class MapPanel extends JPanel{
 
         this.addMouseMotionListener(new MouseMotionAdapter(){
             @Override
+            public void mouseMoved(MouseEvent e){
+                repaint();
+            }
+
+            @Override
             public void mouseDragged(MouseEvent e){
                 moveMap.processDragged(e);
             }
 
         });
-  
+
         Button leftButton = new Button(1, 400 - 10, 10, 10,
                 Button.Type.LEFT);
         Button rightButton = new Button(400 - 20, 400
@@ -90,6 +96,15 @@ public class MapPanel extends JPanel{
     protected void paintComponent(Graphics g){
         Graphics2D g2d = (Graphics2D) g;
         g2d.clearRect(0, 0, this.getWidth(), this.getHeight());
+
+        if(this.clickedMindIndex != -1){
+            MindPoint target = this.mindpoints.get(this.clickedMindIndex);
+            g2d.drawLine(target.getX() + target.getWidth() / 2,
+                    target.getY() + target.getHeight() / 2,
+                    (int) (MouseInfo.getPointerInfo().getLocation().getX() - this.getLocationOnScreen().getX()),
+                    (int) (MouseInfo.getPointerInfo().getLocation().getY() - this.getLocationOnScreen().getY()));
+        }
+
         mindpoints.forEach((mindpoint) -> {
             mindpoint.draw(g2d, dx, dy);
         });
@@ -189,7 +204,8 @@ public class MapPanel extends JPanel{
                     }
                     if(this.clickedMindIndex == -1){
                         this.clickedMindIndex = clickedIndex;
-                        setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+                        setCursor(Cursor.getPredefinedCursor(
+                                Cursor.CROSSHAIR_CURSOR));
                     }else{
                         this.mindpoints.get(this.clickedMindIndex).
                                 addOutConnection(this.mindpoints.get(
