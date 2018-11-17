@@ -30,6 +30,7 @@ public class MapPanel extends JPanel{
     private ArrayList<Button> scrollButtons;
     private Button add;
     private int adding;
+    private int clickedMindIndex;
 
     public MapPanel(){
         this.mindpoints = new ArrayList<>();
@@ -38,6 +39,7 @@ public class MapPanel extends JPanel{
         this.dy = 0;
         this.dx = 0;
         this.adding = -1;
+        this.clickedMindIndex = -1;
 
         Movement moveMap = new Movement(this);
 
@@ -48,15 +50,14 @@ public class MapPanel extends JPanel{
             }
 
             @Override
-            public void mouseReleased(MouseEvent me) {
+            public void mouseReleased(MouseEvent me){
                 moveMap.processReleased(me);
             }
 
             @Override
-            public void mousePressed(MouseEvent me) {
+            public void mousePressed(MouseEvent me){
                 moveMap.processPressed(me);
             }
-              
 
         });
 
@@ -149,6 +150,7 @@ public class MapPanel extends JPanel{
             }
         }
         //</editor-fold>
+        //<editor-fold defaultstate="collapsed" desc="addButton">
         if(!processed
                 && new Rectangle2D.Double(this.add.getX(), this.add.getY(),
                         this.add.getWidth(), this.add.getHeight())
@@ -163,18 +165,44 @@ public class MapPanel extends JPanel{
             }
             processed = true;
         }
+        //</editor-fold>
+        //<editor-fold defaultstate="collapsed" desc="adding">
         if(!processed && this.adding != -1){
             switch(this.adding){
                 case 1:
                     this.addMindpoint(new MindPoint(e.getX() - 50 + this.dx,
                             e.getY() - 25 + this.dy, 100, 50, 3));
+                    this.adding = -1;
+                    setCursor(Cursor.getDefaultCursor());
                     break;
-                case 2: break;
+                case 2:
+                    int clickedIndex = -1;
+                    for(MindPoint mindpoint : mindpoints){
+                        if(mindpoint.getEllipse(this.dx, this.dy).contains(e.
+                                getX(),
+                                e.getY())){
+                            if(clickedIndex == -1){
+                                clickedIndex = this.mindpoints.
+                                        indexOf(mindpoint);
+                            }
+                        }
+                    }
+                    if(this.clickedMindIndex == -1){
+                        this.clickedMindIndex = clickedIndex;
+                        setCursor(Cursor.getPredefinedCursor(Cursor.CROSSHAIR_CURSOR));
+                    }else{
+                        this.mindpoints.get(this.clickedMindIndex).
+                                addOutConnection(this.mindpoints.get(
+                                        clickedIndex));
+                        this.clickedMindIndex = -1;
+                        this.adding = -1;
+                        setCursor(Cursor.getDefaultCursor());
+                    }
+                    break;
             }
-            this.adding = -1;
-            setCursor(Cursor.getDefaultCursor());
             processed = true;
         }
+//</editor-fold>
         //<editor-fold defaultstate="collapsed" desc="mindpoints">
         boolean found = false;
         for(MindPoint mindpoint : mindpoints){
