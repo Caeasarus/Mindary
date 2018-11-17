@@ -37,16 +37,18 @@ public class Mindmap{
         });
         frame.requestFocus();
         
-        MindPoint mindpoint1 = new MindPoint(5, 5, 100, 50, 3);
-        MindPoint mindpoint2 = new MindPoint(200, 100, 100, 50, 3);
+        MindPoint mindpoint1 = new MindPoint(5, 5, 3);
+        MindPoint mindpoint2 = new MindPoint(200, 100, 3);
         
         mindpoint1.addOutConnection(mindpoint2);
         
         this.mindmap.addMindpoint(mindpoint1);
         this.mindmap.addMindpoint(mindpoint2);
         
-        this.frame.setVisible(true);
+        
         this.frame.pack();
+        this.frame.setLocationRelativeTo(null);
+        this.frame.setVisible(true);
     }
 
     /**
