@@ -32,6 +32,9 @@ public class MapPanel extends JPanel{
     private int adding;
     private int clickedMindIndex;
 
+    private int grabbedMindPointIndex;
+    private Point grabPoint;
+    
     public MapPanel(){
         this.mindpoints = new ArrayList<>();
         this.scrollButtons = new ArrayList<>();
@@ -40,6 +43,7 @@ public class MapPanel extends JPanel{
         this.dx = 0;
         this.adding = -1;
         this.clickedMindIndex = -1;
+        this.grabbedMindPointIndex = -1;
 
         Movement moveMap = new Movement(this);
 
@@ -50,13 +54,14 @@ public class MapPanel extends JPanel{
             }
 
             @Override
-            public void mouseReleased(MouseEvent me){
-                moveMap.processReleased(me);
+            public void mouseReleased(MouseEvent e) {
+                moveMap.processReleased(e);
             }
 
             @Override
-            public void mousePressed(MouseEvent me){
-                moveMap.processPressed(me);
+            public void mousePressed(MouseEvent e) {
+                moveMap.processPressed(e);
+                processPressed(e);
             }
 
         });
@@ -65,6 +70,7 @@ public class MapPanel extends JPanel{
             @Override
             public void mouseDragged(MouseEvent e){
                 moveMap.processDragged(e);
+                processDragged(e);
             }
 
         });
@@ -221,6 +227,41 @@ public class MapPanel extends JPanel{
         this.repaint();
     }
 
+     public void processDragged(MouseEvent e){
+        if(this.grabbedMindPointIndex != -1){
+            int x = this.mindpoints.get(grabbedMindPointIndex).getX();
+            int y = this.mindpoints.get(grabbedMindPointIndex).getY();
+
+            
+            this.mindpoints.get(grabbedMindPointIndex).setX(e.getX() - 
+                    this.grabPoint.x);
+            this.mindpoints.get(grabbedMindPointIndex).setY(e.getY() - 
+                    this.grabPoint.y);
+            repaint();
+        }
+    }
+    
+    public void processPressed(MouseEvent e){
+        Point clickPoint = e.getPoint();
+        
+        for(int i = 0; i < mindpoints.size(); i++){
+            if(mindpoints.get(i).getEllipse(this.dx, this.dy)
+                    .contains(clickPoint.getX(), clickPoint.getY())){
+                if(!mindpoints.get(i).getInnerEllipse(this.dx, this.dy)
+                    .contains(clickPoint.getX(), clickPoint.getY())){
+                    this.grabbedMindPointIndex = i;
+                    grabPoint = new Point(e.getX() - mindpoints.get(i).getX(), 
+                            e.getY() - mindpoints.get(i).getY());
+                    this.setCursor(Cursor.getPredefinedCursor(Cursor.MOVE_CURSOR));
+                    return;
+                }
+            }
+
+        }
+        
+        this.grabbedMindPointIndex = -1;
+    }
+    
     protected void processKey(KeyEvent e){
         for(MindPoint mindpoint : mindpoints){
             if(mindpoint.isProcessingInput()){
