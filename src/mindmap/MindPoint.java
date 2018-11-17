@@ -10,6 +10,7 @@ import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Ellipse2D;
+import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -19,6 +20,9 @@ import java.util.Objects;
  */
 public class MindPoint{
 
+    public static final int STANDART_WIDTH = 100;
+    public static final int STANDART_HEIGHT = 50;
+    
     private int x;
     private int y;
     private int width;
@@ -28,11 +32,11 @@ public class MindPoint{
     private boolean processingInput;
     private String text;
 
-    public MindPoint(int x, int y, int width, int height, int edgeThickness){
+    public MindPoint(int x, int y, int edgeThickness){
         this.x = x;
         this.y = y;
-        this.width = width;
-        this.height = height;
+        this.width = STANDART_WIDTH;
+        this.height = STANDART_HEIGHT;
         this.edgeThickness = edgeThickness;
         this.outConnections = new ArrayList<>();
         this.text = "";
@@ -50,6 +54,7 @@ public class MindPoint{
             g2d.setColor(old);
             outConnection.overdrawConnections(g2d, dx, dy);
         });
+              
         this.overdrawConnections(g2d, dx, dy);
     }
 
@@ -65,6 +70,25 @@ public class MindPoint{
                 - fontMetrics.stringWidth(this.getPrintingText()) / 2,
                 this.y - dy + this.height / 2 + fontMetrics.getHeight() / 4);
         g2d.setColor(old);
+        
+        if(STANDART_WIDTH < 
+                fontMetrics.stringWidth(this.getPrintingText()) + 10){
+            int tempWith = this.width;
+            this.width = fontMetrics.stringWidth(this.getPrintingText()) + 10;
+            this.x -= (width - tempWith) / 2;
+            java.awt.geom.Rectangle2D  rect = 
+                    new java.awt.geom.Rectangle2D.Double
+        (this.x - dx + 10, ((this.y - dy) + (this.height/ 2)) - 
+                fontMetrics.getHeight() / 2 , 
+                fontMetrics.stringWidth(this.getPrintingText()) - 10, 
+                fontMetrics.getHeight());
+            if(!this.getEllipse(dx, dy).contains(rect)){
+                this.height += 2;
+                this.y -= 1;
+            }
+        }else{
+            width = STANDART_WIDTH;
+        }         
     }
 
     public int getX(){

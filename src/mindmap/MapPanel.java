@@ -68,7 +68,7 @@ public class MapPanel extends JPanel{
             }
 
         });
-
+  
         Button leftButton = new Button(1, 400 - 10, 10, 10,
                 Button.Type.LEFT);
         Button rightButton = new Button(400 - 20, 400
@@ -171,7 +171,7 @@ public class MapPanel extends JPanel{
             switch(this.adding){
                 case 1:
                     this.addMindpoint(new MindPoint(e.getX() - 50 + this.dx,
-                            e.getY() - 25 + this.dy, 100, 50, 3));
+                            e.getY() - 25 + this.dy, 3));
                     this.adding = -1;
                     setCursor(Cursor.getDefaultCursor());
                     break;
@@ -215,7 +215,7 @@ public class MapPanel extends JPanel{
                 found = true;
             }else{
                 mindpoint.processInput(false);
-            }
+            }//else if(mindpoint.getEllipse(this.dx, this.dy))
         }
         //</editor-fold>
         this.repaint();
