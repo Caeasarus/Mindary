@@ -11,6 +11,7 @@ import java.awt.Graphics2D;
 import java.awt.event.KeyEvent;
 import java.awt.geom.Ellipse2D;
 import java.util.ArrayList;
+import java.util.Objects;
 
 /**
  *
@@ -174,5 +175,54 @@ public class MindPoint{
         }else{
             return ">" + this.text + "<";
         }
+    }
+
+    @Override
+    public boolean equals(Object obj){
+        if(this == obj){
+            return true;
+        }
+        if(obj == null){
+            return false;
+        }
+        if(getClass() != obj.getClass()){
+            return false;
+        }
+        final MindPoint other = (MindPoint) obj;
+        if(this.x != other.x){
+            return false;
+        }
+        if(this.y != other.y){
+            return false;
+        }
+        if(this.width != other.width){
+            return false;
+        }
+        if(this.height != other.height){
+            return false;
+        }
+        if(this.edgeThickness != other.edgeThickness){
+            return false;
+        }
+        if(!Objects.equals(this.text, other.text)){
+            return false;
+        }
+        if(!Objects.equals(this.outConnections, other.outConnections)){
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public int hashCode(){
+        int hash = 7;
+        hash = 97 * hash + this.x;
+        hash = 97 * hash + this.y;
+        hash = 97 * hash + this.width;
+        hash = 97 * hash + this.height;
+        hash = 97 * hash + this.edgeThickness;
+        hash = 97 * hash + Objects.hashCode(this.outConnections);
+        hash = 97 * hash + Objects.hashCode(this.text);
+        return hash;
     }
 }
