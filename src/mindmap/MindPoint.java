@@ -59,18 +59,7 @@ public class MindPoint{
     }
 
     public void overdrawConnections(Graphics2D g2d, int dx, int dy){
-        Color old = g2d.getColor();
-        g2d.setColor(Color.BLACK);
-        g2d.fill(this.getEllipse(dx, dy));
-        g2d.setColor(Color.WHITE);
-        g2d.fill(this.getInnerEllipse(dx, dy));
-        g2d.setColor(Color.BLACK);
         FontMetrics fontMetrics = g2d.getFontMetrics();
-        g2d.drawString(this.getPrintingText(), this.x - dx + this.width / 2
-                - fontMetrics.stringWidth(this.getPrintingText()) / 2,
-                this.y - dy + this.height / 2 + fontMetrics.getHeight() / 4);
-        g2d.setColor(old);
-        
         if(STANDART_WIDTH < 
                 fontMetrics.stringWidth(this.getPrintingText()) + 10){
             int tempWith = this.width;
@@ -88,7 +77,18 @@ public class MindPoint{
             }
         }else{
             width = STANDART_WIDTH;
-        }         
+        }          
+        Color old = g2d.getColor();
+        g2d.setColor(Color.BLACK);
+        g2d.fill(this.getEllipse(dx, dy));
+        g2d.setColor(Color.WHITE);
+        g2d.fill(this.getInnerEllipse(dx, dy));
+        g2d.setColor(Color.BLACK);
+        g2d.drawString(this.getPrintingText(), this.x - dx + this.width / 2
+                - fontMetrics.stringWidth(this.getPrintingText()) / 2,
+                this.y - dy + this.height / 2 + fontMetrics.getHeight() / 4);
+        g2d.setColor(old);
+        
     }
 
     public int getX(){
